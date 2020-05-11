@@ -12,5 +12,14 @@
 2. Double click it the jar file or right click and select open.
 >![right click & select open](https://i.imgur.com/nhuTfFe.png)
 
-3. The program will automatically run and the output images will appear in the same folder.
+3. Done. The program will automatically run and the output images will appear in the same folder.
 >![folder after](https://i.imgur.com/dXogaWu.png)
+
+## Examples (before and after)
+
+Before             |  After
+:-------------------------:|:-------------------------:
+![Ex C](https://i.imgur.com/sAauAqS.jpg)  |  ![Ex C fixed](https://i.imgur.com/SG76gMU.jpg)
+![Ex A](https://i.imgur.com/H6TmYYk.jpg)  |  ![Ex A fixed](https://i.imgur.com/oTbSswC.jpg)
+![Ex B](https://i.imgur.com/kxaAre3.jpg)  |  ![Ex B fixed](https://i.imgur.com/Hv6lXiy.jpg)
+![Ex D](https://i.imgur.com/khB9WTE.jpg)  |  ![Ex D fixed](https://i.imgur.com/W92gAI7.jpg)
