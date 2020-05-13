@@ -52,6 +52,11 @@ public class ProgramUI extends javax.swing.JFrame {
         jLabel3.setText("Result Folder:");
 
         sourceFolderField.setText("err");
+        sourceFolderField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sourceFolderFieldActionPerformed(evt);
+            }
+        });
 
         sourceFolderButton.setText("...");
         sourceFolderButton.setMaximumSize(new java.awt.Dimension(22, 22));
@@ -64,6 +69,11 @@ public class ProgramUI extends javax.swing.JFrame {
         });
 
         resultFolderField.setText("err");
+        resultFolderField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resultFolderFieldActionPerformed(evt);
+            }
+        });
 
         resultFolderButton.setText("...");
         resultFolderButton.setMaximumSize(new java.awt.Dimension(22, 22));
@@ -191,19 +201,33 @@ public class ProgramUI extends javax.swing.JFrame {
         int optionCode = jfc.showSaveDialog(null); 
         
         if (optionCode == JFileChooser.APPROVE_OPTION) {
-            sourceFolderField.setText(jfc.getSelectedFile().getAbsolutePath());
+            controller.sourcePath = jfc.getSelectedFile().getAbsolutePath();
+            sourceFolderField.setText(controller.sourcePath);
+            behaviorTextArea.setText(controller.getCurrentBehavior());
         }
     }//GEN-LAST:event_sourceFolderButtonActionPerformed
 
     private void resultFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resultFolderButtonActionPerformed
-        JFileChooser j = new JFileChooser(); 
-        j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); 
-        int optionCode = j.showSaveDialog(null); 
+        JFileChooser jfc = new JFileChooser(); 
+        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); 
+        int optionCode = jfc.showSaveDialog(null); 
         
         if (optionCode == JFileChooser.APPROVE_OPTION) {
-            resultFolderField.setText(j.getSelectedFile().getAbsolutePath());
+            controller.resultPath = jfc.getSelectedFile().getAbsolutePath();
+            resultFolderField.setText(controller.resultPath);
+            behaviorTextArea.setText(controller.getCurrentBehavior());
         }
     }//GEN-LAST:event_resultFolderButtonActionPerformed
+
+    private void sourceFolderFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sourceFolderFieldActionPerformed
+        controller.sourcePath = sourceFolderField.getText();
+        behaviorTextArea.setText(controller.getCurrentBehavior());
+    }//GEN-LAST:event_sourceFolderFieldActionPerformed
+
+    private void resultFolderFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resultFolderFieldActionPerformed
+        controller.resultPath = resultFolderField.getText();
+        behaviorTextArea.setText(controller.getCurrentBehavior());
+    }//GEN-LAST:event_resultFolderFieldActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

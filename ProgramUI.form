@@ -125,6 +125,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="err"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="sourceFolderFieldActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="sourceFolderButton">
           <Properties>
@@ -147,6 +150,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="err"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="resultFolderFieldActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="resultFolderButton">
           <Properties>
