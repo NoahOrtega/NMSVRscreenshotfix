@@ -12,16 +12,44 @@ import java.awt.Graphics2D;
  * creates a copy of it with an aspect ratio to 1:1
  * @author Noah Ortega
  */
-public class NMSVRScreenshotFix {
-    static int totalFiles = 0;
-    static BufferedImage curImage;
-    static String appendToNewFile = "_fix";
+public class NMSVRScreenshotFix {    
+    
+    public static void main(String[] args) {
+        LogicController.getInstance();
+    }
+}
+
+class LogicController {
+    //singleton
+    private static LogicController sharedController = null;
+    private LogicController() {
+        launchUI();
+    }
+    public static LogicController getInstance() {
+        if(sharedController == null) {
+            sharedController = new LogicController();
+        }
+        return sharedController;
+    }
+    
+    int totalFiles = 0;
+    
+    private BufferedImage curImage;
+    
+    public String sourcePath;
+    public String resultPath;
+    public String behavior;
+    public boolean shouldRename = true;
+    public boolean renameNewFile = true;
+    public String addToFile = "_fix";
+    public boolean addAsPrefix = false;
     
     /**
      * Iterates through the files in the directory, validates files before 
      * allowing resizing.
      */
-    public static void main(String[] args) {
+    private void execute() {
+        
         File curFolder = new File(System.getProperty("user.dir")); //current directory
         String curFilePath;
         
@@ -46,22 +74,56 @@ public class NMSVRScreenshotFix {
                 System.err.println(">> Caught IOException on file '" + curFilePath + "':\n  " + e.getMessage());
             }   
         }
-    }
+    }    
+        
+        
+    private void launchUI() {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(ProgramUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(ProgramUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(ProgramUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(ProgramUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
 
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new ProgramUI().setVisible(true);
+            }
+        });
+    }
     
     /**
      * Determines if a file is a basic image type
      * @param path file path of image
      * @return true if extension is .png .jpg or .jpeg
      */
-    public static boolean isImage(String path) {
+    private boolean isImage(String path) {
         //extention of file, from file after final period
         int dotIndex = path.lastIndexOf('.');
         String extension = (dotIndex == -1) ? "no extension" : path.substring(dotIndex + 1);
         
         return (extension.equals("png") || extension.equals("jpg") || extension.equals("jpeg"));
     }
-    
     
     /**
      * Determines if an image should be resized based on criteria:
@@ -70,7 +132,7 @@ public class NMSVRScreenshotFix {
      * @param height image height
      * @return true if image matches criteria
      */
-    public static boolean shouldResize(int width, int height) {
+    private boolean shouldResize(int width, int height) {
         if (width == height) {
             System.out.println(">> Already 1:1 aspect ratio");
             return false;
@@ -82,7 +144,6 @@ public class NMSVRScreenshotFix {
         }
     }
     
-    
     /**
      * Resizes an image to a 1:1 aspect ratio by changing the width
      * @param inputImagePath Path of the original input image
@@ -91,7 +152,7 @@ public class NMSVRScreenshotFix {
      * based on code by Nam Ha Minh from article "How to resize images in Java"
      * https://www.codejava.net/java-se/graphics/how-to-resize-images-in-java
      */
-    public static void squish(String inputImagePath) throws IOException {
+    private void squish(String inputImagePath) throws IOException {
 
         int finalWidth = curImage.getHeight();
         int height = curImage.getHeight();
@@ -123,7 +184,7 @@ public class NMSVRScreenshotFix {
      * @param dotIndex the index of the dot in the input path
      * @return the final output path
      */
-    public static String generateOutputPath(String inputPath, int dotIndex) {
-        return inputPath.substring(0, dotIndex) + appendToNewFile + inputPath.substring(dotIndex);
+    public String generateOutputPath(String inputPath, int dotIndex) {
+        return inputPath.substring(0, dotIndex) + addToFile + inputPath.substring(dotIndex);
     }
 }
