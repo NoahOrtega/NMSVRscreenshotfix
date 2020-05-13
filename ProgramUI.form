@@ -175,7 +175,7 @@
                 <Property name="columns" type="int" value="20"/>
                 <Property name="lineWrap" type="boolean" value="true"/>
                 <Property name="rows" type="int" value="5"/>
-                <Property name="text" type="java.lang.String" value="&#x2022; Make copies of converted screenshots&#xa;&#x2022; Add prefix &quot; new_&quot; to new image&#xa;&#x2022; Ex: &quot;image.png&quot; -&gt; &quot;image_new.png&quot;&#xa;"/>
+                <Property name="text" type="java.lang.String" value="&#x2022; Make copies of converted screenshots&#xa;&#x2022; Add prefix &quot; new_&quot; to the new image&#xa;&#x2022; Ex: &quot;image.png&quot; -&gt; &quot;new_image.png&quot;&#xa;"/>
               </Properties>
             </Component>
           </SubComponents>

@@ -12,7 +12,7 @@ public class ProgramUI extends javax.swing.JFrame {
         initComponents();
         resultFolderField.setText(controller.resultPath);
         sourceFolderField.setText(controller.sourcePath);
-        behaviorTextArea.setText(controller.behavior);
+        behaviorTextArea.setText(controller.getCurrentBehavior());
     }
     
     private boolean isExecuting = false;
@@ -78,7 +78,7 @@ public class ProgramUI extends javax.swing.JFrame {
         behaviorTextArea.setColumns(20);
         behaviorTextArea.setLineWrap(true);
         behaviorTextArea.setRows(5);
-        behaviorTextArea.setText("• Make copies of converted screenshots\n• Add prefix \" new_\" to new image\n• Ex: \"image.png\" -> \"image_new.png\"\n");
+        behaviorTextArea.setText("• Make copies of converted screenshots\n• Add prefix \" new_\" to the new image\n• Ex: \"image.png\" -> \"new_image.png\"\n");
         jScrollPane2.setViewportView(behaviorTextArea);
 
         settingsButton.setText("Behavior Settings");
@@ -182,6 +182,7 @@ public class ProgramUI extends javax.swing.JFrame {
     
     private void settingsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_settingsButtonActionPerformed
         new SettingsUI(this,true).setVisible(true);
+        behaviorTextArea.setText(controller.getCurrentBehavior());
     }//GEN-LAST:event_settingsButtonActionPerformed
 
     private void sourceFolderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sourceFolderButtonActionPerformed

@@ -20,10 +20,28 @@ public class NMSVRScreenshotFix {
 }
 
 class LogicController {
+    
+    private boolean shouldRun = false;
+    
+    private int totalFiles;
+    private int filesProcessed = 0;
+    private BufferedImage curImage;
+    
+    public String sourcePath;
+    public String resultPath;
+ 
+    public boolean shouldRename = true;
+    public boolean renameNewFile = true;
+    public String addToFile = "_fix";
+    public boolean addAsPrefix = false;
+    
     //singleton
     private static LogicController sharedController = null;
     private LogicController() {
         launchUI();
+        sourcePath = System.getProperty("user.dir");
+        resultPath = System.getProperty("user.dir");
+
     }
     public static LogicController getInstance() {
         if(sharedController == null) {
@@ -32,35 +50,62 @@ class LogicController {
         return sharedController;
     }
     
-    int totalFiles = 0;
+    public String getCurrentBehavior() {
+        String behavior = "";
+        if(!shouldRename && (sourcePath.equals(resultPath))) {
+            behavior += "• Replacing originals with converted screenshots";
+        }
+        else {
+            behavior += "• Making copies of converted screenshots";
+        }
+        
+        behavior +="\n";
+        if(shouldRename) {
+            if(addAsPrefix) {
+                behavior += "• Adding prefix ";
+            }
+            else {
+                behavior += "• Adding suffix ";
+            }
+            behavior += "\""+addToFile+"\" to ";
+            if(renameNewFile) {
+                behavior += "converted image";
+            }
+            else {
+                behavior += "original image";
+            }
+            behavior += "\n";
+            behavior += "• " + getExampleRename();
+        }
+        return behavior;
+    }
     
-    private BufferedImage curImage;
+    public String getRename(String oldFileName) {
+        return addAsPrefix ? (addToFile+oldFileName) : (oldFileName+addToFile);
+    }
     
-    public String sourcePath;
-    public String resultPath;
-    public String behavior;
-    public boolean shouldRename = true;
-    public boolean renameNewFile = true;
-    public String addToFile = "_fix";
-    public boolean addAsPrefix = false;
+    public String getExampleRename() {
+        String exampleName = renameNewFile ? "converted" : "original";
+        return ("Ex: \"" + exampleName + ".png\" -> \"" + getRename(exampleName) + ".png\"");
+    }  
     
     /**
      * Iterates through the files in the directory, validates files before 
      * allowing resizing.
      */
     private void execute() {
-        
         File curFolder = new File(System.getProperty("user.dir")); //current directory
         String curFilePath;
         
         System.out.println("searching in " + curFolder.getPath());
-
+        
+        totalFiles = curFolder.listFiles().length;
         for (final File fileEntry : curFolder.listFiles()) {
             curFilePath = fileEntry.getPath();
             try {
                 if (!fileEntry.isDirectory() && isImage(curFilePath)) {
-                    totalFiles++;
-                    System.out.print(totalFiles +". ");
+                    filesProcessed++;
+                    System.out.print(filesProcessed +". ");
                     System.out.println(curFilePath);
 
                     curImage = ImageIO.read(fileEntry);
