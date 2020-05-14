@@ -15,8 +15,6 @@ public class ProgramUI extends javax.swing.JFrame {
         behaviorTextArea.setText(controller.getCurrentBehavior());
     }
     
-    private boolean isExecuting = false;
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -38,7 +36,7 @@ public class ProgramUI extends javax.swing.JFrame {
         behaviorTextArea = new javax.swing.JTextArea();
         settingsButton = new javax.swing.JButton();
         executeButton = new javax.swing.JButton();
-        jProgressBar1 = new javax.swing.JProgressBar();
+        progressBar = new javax.swing.JProgressBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("NMS VR Screenshot Fix");
@@ -122,7 +120,7 @@ public class ProgramUI extends javax.swing.JFrame {
                     .addComponent(settingsButton)
                     .addComponent(sourceFolderField)
                     .addComponent(resultFolderField)
-                    .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(progressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(sourceFolderButton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -154,7 +152,7 @@ public class ProgramUI extends javax.swing.JFrame {
                 .addComponent(settingsButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(progressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(executeButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(12, 12, 12))
         );
@@ -174,19 +172,24 @@ public class ProgramUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void executeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_executeButtonActionPerformed
-        isExecuting = !isExecuting;
+        if(controller.isExecuting) {
+            controller.cancelExecution();
+        } 
+        else {
+            controller.execute();
+        }
         toggleUI();
     }//GEN-LAST:event_executeButtonActionPerformed
 
     private void toggleUI() {
-        boolean shouldEnable = !isExecuting;
+        boolean shouldEnable = !controller.isExecuting;
         settingsButton.setEnabled(shouldEnable);
         sourceFolderField.setEnabled(shouldEnable);
         sourceFolderButton.setEnabled(shouldEnable);
         resultFolderField.setEnabled(shouldEnable);
         resultFolderButton.setEnabled(shouldEnable);
         
-        if(isExecuting) {executeButton.setText("cancel");}
+        if(controller.isExecuting) {executeButton.setText("cancel");}
         else {executeButton.setText("execute");}
     }
     
@@ -229,6 +232,10 @@ public class ProgramUI extends javax.swing.JFrame {
         behaviorTextArea.setText(controller.getCurrentBehavior());
     }//GEN-LAST:event_resultFolderFieldActionPerformed
 
+    public void updateProgressBar(int value) {
+        progressBar.setValue(value);
+    }
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea behaviorTextArea;
@@ -237,8 +244,8 @@ public class ProgramUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JProgressBar progressBar;
     private javax.swing.JButton resultFolderButton;
     private javax.swing.JTextField resultFolderField;
     private javax.swing.JButton settingsButton;

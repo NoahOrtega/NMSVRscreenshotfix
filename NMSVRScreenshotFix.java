@@ -21,7 +21,8 @@ public class NMSVRScreenshotFix {
 
 class LogicController {
     
-    private boolean shouldRun = false;
+    public boolean isExecuting = false;
+    public boolean canceled = false;
     
     private int totalFiles;
     private int filesProcessed = 0;
@@ -35,19 +36,106 @@ class LogicController {
     public String addToFile = "_fix";
     public boolean addAsPrefix = false;
     
+    ProgramUI myUI;
+    
     //singleton
     private static LogicController sharedController = null;
     private LogicController() {
         launchUI();
         sourcePath = System.getProperty("user.dir");
         resultPath = System.getProperty("user.dir");
-
     }
     public static LogicController getInstance() {
         if(sharedController == null) {
             sharedController = new LogicController();
         }
         return sharedController;
+    }
+    
+    private void launchUI() {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(ProgramUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(ProgramUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(ProgramUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(ProgramUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+               myUI = new ProgramUI();
+               myUI.setVisible(true);
+            }
+        });
+    }   
+    
+    /**
+     * Iterates through the files in the directory, validates files before 
+     * allowing resizing.
+     */
+    public void execute() {
+        isExecuting = true;
+        canceled = false;
+        filesProcessed = 0;
+        
+        myUI.updateProgressBar(0);
+        
+        File sourceFolder = new File(sourcePath); //current directory
+        File destFolder = new File(resultPath);
+        String curFilePath;
+        
+        System.out.println("searching in " + sourceFolder.getPath());
+        System.out.println("outputing to " + destFolder.getPath());
+        
+        File[] folderContents = sourceFolder.listFiles();
+        totalFiles = folderContents.length;
+        System.out.println("total files: " + totalFiles);
+
+        for (int fileIndex = 0; fileIndex < totalFiles && !canceled; fileIndex++) {
+            curFilePath = folderContents[fileIndex].getPath();
+            try {
+                if (!folderContents[fileIndex].isDirectory() && isImage(curFilePath)) {
+                    filesProcessed++;
+                    System.out.print(filesProcessed +". ");
+                    System.out.println(curFilePath);
+                    
+                    curImage = ImageIO.read(folderContents[fileIndex]);
+
+                    if (shouldResize(curImage.getWidth(), curImage.getHeight())) {
+                        squish(curFilePath);
+                    }
+                }
+            }
+            catch (IOException e){
+                System.err.println(">> Caught IOException on file '" + curFilePath + "':\n  " + e.getMessage());
+            }
+            myUI.updateProgressBar((fileIndex + 1)*100/totalFiles);
+        }
+        isExecuting = false;
+        System.out.println("finished");
+    }
+
+    public void cancelExecution() {
+        canceled = true;
     }
     
     public String getCurrentBehavior() {
@@ -88,74 +176,6 @@ class LogicController {
         String exampleName = renameNewFile ? "converted" : "original";
         return ("Ex: \"" + exampleName + ".png\" -> \"" + getRename(exampleName) + ".png\"");
     }  
-    
-    /**
-     * Iterates through the files in the directory, validates files before 
-     * allowing resizing.
-     */
-    private void execute() {
-        File curFolder = new File(System.getProperty("user.dir")); //current directory
-        String curFilePath;
-        
-        System.out.println("searching in " + curFolder.getPath());
-        
-        totalFiles = curFolder.listFiles().length;
-        for (final File fileEntry : curFolder.listFiles()) {
-            curFilePath = fileEntry.getPath();
-            try {
-                if (!fileEntry.isDirectory() && isImage(curFilePath)) {
-                    filesProcessed++;
-                    System.out.print(filesProcessed +". ");
-                    System.out.println(curFilePath);
-
-                    curImage = ImageIO.read(fileEntry);
-
-                    if (shouldResize(curImage.getWidth(), curImage.getHeight())) {
-                        squish(curFilePath);
-                    }
-                }
-            }
-            catch (IOException e){
-                System.err.println(">> Caught IOException on file '" + curFilePath + "':\n  " + e.getMessage());
-            }   
-        }
-    }    
-        
-        
-    private void launchUI() {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ProgramUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ProgramUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ProgramUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ProgramUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ProgramUI().setVisible(true);
-            }
-        });
-    }
     
     /**
      * Determines if a file is a basic image type
