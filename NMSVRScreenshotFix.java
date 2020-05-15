@@ -6,6 +6,8 @@ import java.io.File;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Iterates through every image in the executable's folder and if applicable, 
@@ -25,7 +27,6 @@ class LogicController {
     public boolean canceled = false;
     
     private int totalFiles;
-    private int filesProcessed = 0;
     private BufferedImage curImage;
     
     public String sourcePath;
@@ -93,45 +94,75 @@ class LogicController {
      * allowing resizing.
      */
     public void execute() {
+        System.out.println("starting");
         isExecuting = true;
         canceled = false;
-        filesProcessed = 0;
-        
         myUI.updateProgressBar(0);
         
-        File sourceFolder = new File(sourcePath); //current directory
-        File destFolder = new File(resultPath);
-        String curFilePath;
-        
-        System.out.println("searching in " + sourceFolder.getPath());
-        System.out.println("outputing to " + destFolder.getPath());
+        File sourceFolder = new File(sourcePath); //file of originals
+        File destFolder = new File(resultPath); //destination files
         
         File[] folderContents = sourceFolder.listFiles();
         totalFiles = folderContents.length;
-        System.out.println("total files: " + totalFiles);
+        File curFile;
 
+        
         for (int fileIndex = 0; fileIndex < totalFiles && !canceled; fileIndex++) {
-            curFilePath = folderContents[fileIndex].getPath();
-            try {
-                if (!folderContents[fileIndex].isDirectory() && isImage(curFilePath)) {
-                    filesProcessed++;
-                    System.out.print(filesProcessed +". ");
-                    System.out.println(curFilePath);
-                    
-                    curImage = ImageIO.read(folderContents[fileIndex]);
+            curFile = folderContents[fileIndex];
 
+            if (!folderContents[fileIndex].isDirectory() && isImage(curFile.getPath())) {
+                System.out.println(fileIndex);
+                try {
+                    curImage = ImageIO.read(folderContents[fileIndex]);
                     if (shouldResize(curImage.getWidth(), curImage.getHeight())) {
-                        squish(curFilePath);
+                        squish(curFile);
                     }
+                } 
+                catch (IOException ex) {
+                    System.err.println(">> Caught IOException on '" + curFile.getPath() + "':\n  " + ex.getMessage());
                 }
-            }
-            catch (IOException e){
-                System.err.println(">> Caught IOException on file '" + curFilePath + "':\n  " + e.getMessage());
             }
             myUI.updateProgressBar((fileIndex + 1)*100/totalFiles);
         }
         isExecuting = false;
         System.out.println("finished");
+    }
+    
+     /**
+     * Resizes an image to a 1:1 aspect ratio by changing the width
+     * @param originalFile Path of the original input image
+     * @throws java.io.IOException
+     * 
+     * based on code by Nam Ha Minh from article "How to resize images in Java"
+     * https://www.codejava.net/java-se/graphics/how-to-resize-images-in-java
+     */
+    private void squish(File originalFile) throws IOException {
+        int newWidth = curImage.getHeight();
+        int height = curImage.getHeight();
+        // creates output image
+        BufferedImage outputImage = new BufferedImage(newWidth, height, curImage.getType());
+        
+        // scales the input image to the output image
+        Graphics2D g2d = outputImage.createGraphics();
+        g2d.drawImage(curImage, 0, 0, newWidth, height, null);
+        g2d.dispose();
+        
+        int fileDotIndex = originalFile.getName().lastIndexOf('.');
+        String formatName = originalFile.getName().substring(fileDotIndex + 1);
+        
+        File newFile = new File(resultPath +"/"+ originalFile.getName());
+        if(shouldRename) {
+            if (renameNewFile) {
+                newFile = modifyFilePath(resultPath,originalFile.getName());
+            }
+            else {
+                originalFile.renameTo(modifyFilePath(sourcePath,originalFile.getName()));
+            }
+        }
+        // write to output file
+        ImageIO.write(outputImage, formatName, newFile);
+        
+        System.out.println(">> Converted");
     }
 
     public void cancelExecution() {
@@ -168,19 +199,30 @@ class LogicController {
         return behavior;
     }
     
-    public String getRename(String oldFileName) {
-        return addAsPrefix ? (addToFile+oldFileName) : (oldFileName+addToFile);
+    private String getRename(String oldName) {
+        int dotIndex = oldName.lastIndexOf('.');
+        
+        String name = oldName.substring(0, dotIndex);
+        String ext = oldName.substring(dotIndex);
+        
+        return addAsPrefix ? (addToFile+name+ext) : (name+addToFile+ext);
     }
     
-    public String getExampleRename() {
-        String exampleName = renameNewFile ? "converted" : "original";
-        return ("Ex: \"" + exampleName + ".png\" -> \"" + getRename(exampleName) + ".png\"");
+    private String getExampleRename() {
+        String exampleName = renameNewFile ? "converted.png" : "original.png";
+        return ("Ex: \"" + exampleName + "\" -> \"" + getRename(exampleName) +"\"");
     }  
+    
+    private File modifyFilePath(String parentPath, String fileName) {
+        System.out.println("parent: " + parentPath);
+        System.out.println("new path: " + (parentPath + "/" + getRename(fileName)));
+        return (new File(parentPath + "/" + getRename(fileName)));
+    }
     
     /**
      * Determines if a file is a basic image type
      * @param path file path of image
-     * @return true if extension is .png .jpg or .jpeg
+     * @return true if extension is png jpg or jpeg
      */
     private boolean isImage(String path) {
         //extention of file, from file after final period
@@ -210,46 +252,14 @@ class LogicController {
     }
     
     /**
-     * Resizes an image to a 1:1 aspect ratio by changing the width
-     * @param inputImagePath Path of the original input image
-     * @throws java.io.IOException
-     * 
-     * based on code by Nam Ha Minh from article "How to resize images in Java"
-     * https://www.codejava.net/java-se/graphics/how-to-resize-images-in-java
-     */
-    private void squish(String inputImagePath) throws IOException {
-
-        int finalWidth = curImage.getHeight();
-        int height = curImage.getHeight();
-        
-        // creates output image
-        BufferedImage outputImage = new BufferedImage(finalWidth,
-        height, curImage.getType());
-
-        // scales the input image to the output image
-        Graphics2D g2d = outputImage.createGraphics();
-        g2d.drawImage(curImage, 0, 0, finalWidth, height, null);
-        g2d.dispose();
-
-        // extracts extension of output file
-        int dotIndex = inputImagePath.lastIndexOf('.');
-        String formatName = inputImagePath.substring(dotIndex + 1);
-        
-        String outputImagePath = generateOutputPath(inputImagePath, dotIndex);
-        
-        // writes to output file
-        ImageIO.write(outputImage, formatName, new File(outputImagePath));
-
-        System.out.println(">> Converted");
-    }
-    
-    /**
      * For generating the path of the output image
      * @param inputPath Path of the original input image
      * @param dotIndex the index of the dot in the input path
      * @return the final output path
      */
     public String generateOutputPath(String inputPath, int dotIndex) {
+        
+        
         return inputPath.substring(0, dotIndex) + addToFile + inputPath.substring(dotIndex);
     }
 }

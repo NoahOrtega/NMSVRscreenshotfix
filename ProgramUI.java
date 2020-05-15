@@ -235,7 +235,6 @@ public class ProgramUI extends javax.swing.JFrame {
     public void updateProgressBar(int value) {
         progressBar.setValue(value);
     }
-    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea behaviorTextArea;
