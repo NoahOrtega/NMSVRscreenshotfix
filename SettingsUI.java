@@ -6,6 +6,7 @@
 package nmsvrscreenshotfix;
 
 import java.awt.Component;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 /**
@@ -247,8 +248,15 @@ public class SettingsUI extends javax.swing.JDialog {
     }//GEN-LAST:event_renameButtonActionPerformed
 
     private void ConfirmButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ConfirmButtonActionPerformed
-        controller.addToFile = addTextField.getText();
-        this.setVisible(false);
+        if (controller.isValidAddition(addTextField.getText())) {
+            controller.addToFile = addTextField.getText();
+            this.setVisible(false);
+        }
+        else {
+            JOptionPane.showMessageDialog(this,
+                    "Text can only contain alphanumeric characters, '_' and '-'.","Error",
+                    JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_ConfirmButtonActionPerformed
 
     private void renameNewButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_renameNewButtonActionPerformed

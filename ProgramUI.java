@@ -2,6 +2,7 @@
 package nmsvrscreenshotfix;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 
 public class ProgramUI extends javax.swing.JFrame {
@@ -174,11 +175,21 @@ public class ProgramUI extends javax.swing.JFrame {
     private void executeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_executeButtonActionPerformed
         if(controller.isExecuting) {
             controller.cancelExecution();
+            toggleUI();
         } 
         else {
-            controller.execute();
+            controller.sourcePath = sourceFolderField.getText();
+            controller.resultPath = resultFolderField.getText();
+            if (controller.hasValidDirectoryPaths()) {
+                controller.execute();
+                toggleUI();
+            }
+            else {
+                JOptionPane.showMessageDialog(this,
+                    "One of the paths appears to not be a valid folder","Error",
+                    JOptionPane.WARNING_MESSAGE);
+            }
         }
-        toggleUI();
     }//GEN-LAST:event_executeButtonActionPerformed
 
     private void toggleUI() {
@@ -234,6 +245,19 @@ public class ProgramUI extends javax.swing.JFrame {
 
     public void updateProgressBar(int value) {
         progressBar.setValue(value);
+    }
+    
+    public void successPopup(int value) {
+        JOptionPane.showMessageDialog(this,
+            ("Converted " + value + " images successfully."),"Complete",
+            JOptionPane.INFORMATION_MESSAGE);
+        progressBar.setValue(0);
+    }
+    
+    public void cancelPopup(int value) {
+        JOptionPane.showMessageDialog(this,
+            "Converted " + value + " files before canceling.","Canceled",
+            JOptionPane.ERROR_MESSAGE);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

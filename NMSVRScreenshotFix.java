@@ -6,6 +6,7 @@ import java.io.File;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
+import static java.lang.Character.isLetterOrDigit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,6 +28,7 @@ class LogicController {
     public boolean canceled = false;
     
     private int totalFiles;
+    private int converted;
     private BufferedImage curImage;
     
     public String sourcePath;
@@ -52,6 +54,7 @@ class LogicController {
         }
         return sharedController;
     }
+    
     
     private void launchUI() {
         /* Set the Nimbus look and feel */
@@ -98,6 +101,7 @@ class LogicController {
         isExecuting = true;
         canceled = false;
         myUI.updateProgressBar(0);
+        converted = 0;
         
         File sourceFolder = new File(sourcePath); //file of originals
         File destFolder = new File(resultPath); //destination files
@@ -109,13 +113,14 @@ class LogicController {
         
         for (int fileIndex = 0; fileIndex < totalFiles && !canceled; fileIndex++) {
             curFile = folderContents[fileIndex];
-
             if (!folderContents[fileIndex].isDirectory() && isImage(curFile.getPath())) {
                 System.out.println(fileIndex);
+                //System.out.println(curFile.getPath());
                 try {
                     curImage = ImageIO.read(folderContents[fileIndex]);
                     if (shouldResize(curImage.getWidth(), curImage.getHeight())) {
                         squish(curFile);
+                        converted++;
                     }
                 } 
                 catch (IOException ex) {
@@ -124,6 +129,9 @@ class LogicController {
             }
             myUI.updateProgressBar((fileIndex + 1)*100/totalFiles);
         }
+        if(canceled) {myUI.cancelPopup(converted);}
+        else {myUI.successPopup(converted);}
+        
         isExecuting = false;
         System.out.println("finished");
     }
@@ -214,8 +222,6 @@ class LogicController {
     }  
     
     private File modifyFilePath(String parentPath, String fileName) {
-        System.out.println("parent: " + parentPath);
-        System.out.println("new path: " + (parentPath + "/" + getRename(fileName)));
         return (new File(parentPath + "/" + getRename(fileName)));
     }
     
@@ -228,7 +234,7 @@ class LogicController {
         //extention of file, from file after final period
         int dotIndex = path.lastIndexOf('.');
         String extension = (dotIndex == -1) ? "no extension" : path.substring(dotIndex + 1);
-        
+        extension = extension.toLowerCase();
         return (extension.equals("png") || extension.equals("jpg") || extension.equals("jpeg"));
     }
     
@@ -258,8 +264,24 @@ class LogicController {
      * @return the final output path
      */
     public String generateOutputPath(String inputPath, int dotIndex) {
-        
-        
+
         return inputPath.substring(0, dotIndex) + addToFile + inputPath.substring(dotIndex);
+    }
+    
+    public boolean isValidAddition(String phrase) {
+        
+        for (int charIndex = 0; charIndex < phrase.length(); charIndex++) {
+            char curChar = phrase.charAt(charIndex);
+            if(!isLetterOrDigit(curChar)) {
+                if(curChar != '_' && curChar != '-') {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    public boolean hasValidDirectoryPaths() {
+        return((new File(sourcePath)).isDirectory() && (new File(resultPath)).isDirectory());
     }
 }
