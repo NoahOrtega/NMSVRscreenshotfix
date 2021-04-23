@@ -1,5 +1,6 @@
-# NMS-VR-Screenshot-Fix
-By default, No Man's Sky VR screenshots appear stretched. By changing their aspect ratio to 1:1 (making them square), the shots look much more natural. To automate this solution, this program makes 1:1 aspect ratio copies of your screenshots.
+# ~~NMS-VR-Screenshot-Fix~~
+~~By default, No Man's Sky VR screenshots appear stretched. By changing their aspect ratio to 1:1 (making them square), the shots look much more natural. To automate this solution, this program makes 1:1 aspect ratio copies of your screenshots.~~
+This Program has become redundant because the NMS devs recently patched the issue! I will keep the repository up as a record, but this tool no longer provides a utility for players.
  
 ## Download
  The executable jar can be downloaded in the assets of the most recent release: [found here](https://github.com/NoahOrtega/nmsvrscreenshotfix/releases/tag/v1.0) 
